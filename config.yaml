@@ -1,0 +1,51 @@
+# ===== Folder AI Monitor — MVP config =====
+
+project:
+  name: folder-ai-monitor
+  mode: mvp
+
+monitor:
+  # Абсолютный путь к папке для мониторинга
+  # ВАЖНО:
+  # - либо / вместо \
+  # - либо экранировать \\ (но / проще и безопаснее)
+  watch_path: "E:/Лаборатория/05_Эксперименты/folder-ai-monitor/inbox"
+
+  # Отслеживаемые расширения
+  extensions:
+    - ".md"
+    - ".txt"
+    - ".pdf"
+
+  # Игнорировать скрытые файлы (начинающиеся с .)
+  ignore_hidden: true
+
+files:
+  # Максимум символов, передаваемых в AI
+  max_chars: 12000
+
+ai:
+  provider: gemini
+  model: "gemini-2.5-flash"
+
+  # Основной prompt
+  prompt: |
+    Ты — аналитический ассистент.
+    Проанализируй текст файла.
+    Сформируй краткое структурированное резюме.
+    Выдели:
+    - ключевые идеи
+    - задачи (если есть; если нет — явно указать)
+    - потенциальные темы для продолжения
+
+telegram:
+  enabled: true
+
+  # Ограничение Telegram
+  max_message_length: 4096
+
+logging:
+  level: INFO
+
+  # Относительный путь — создаётся автоматически
+  file: "logs/app.log"

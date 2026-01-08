@@ -1,0 +1,8 @@
+watchdog==3.0.0
+python-telegram-bot==20.7
+python-dotenv==1.0.1
+PyYAML==6.0.1
+requests==2.31.0
+pdfplumber==0.10.3
+google-genai>=0.3.0
+
