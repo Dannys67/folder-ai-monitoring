@@ -1,4 +1,6 @@
 import os
+import sys
+import atexit
 import time
 import logging
 import threading
@@ -33,6 +35,8 @@ def start_async_loop():
 # ============================================================
 
 BASE_DIR = Path(__file__).parent
+STOP_FILE = BASE_DIR / "STOP"
+PID_FILE = BASE_DIR / "monitor.pid"
 CONFIG_PATH = BASE_DIR / "config.yaml"
 
 load_dotenv()
@@ -208,6 +212,21 @@ class FileHandler(FileSystemEventHandler):
         except Exception:
             logging.exception(f"Error processing file: {path}")
 
+# ============================================================
+# Pid
+# ============================================================
+
+def write_pid():
+    pid = os.getpid()
+    PID_FILE.write_text(str(pid), encoding="utf-8")
+    logging.info(f"PID written: {pid}")
+
+
+def remove_pid():
+    if PID_FILE.exists():
+        PID_FILE.unlink()
+        logging.info("PID file removed")
+
 
 # ============================================================
 # Main
@@ -219,6 +238,10 @@ def main():
     config = load_config()
     setup_logging(config)
 
+    write_pid()
+    logging.info(f"Monitor started with PID {os.getpid()}")
+
+    # async loop for Telegram
     threading.Thread(
         target=start_async_loop,
         daemon=True
@@ -238,14 +261,26 @@ def main():
 
     try:
         while True:
+            if STOP_FILE.exists():
+                logging.info("STOP file detected. Shutting down monitor.")
+                break
             time.sleep(1)
+
     except KeyboardInterrupt:
-        logging.info("Stopping monitor...")
+        logging.info("KeyboardInterrupt received")
+
+    finally:
+        logging.info("Stopping observer...")
         observer.stop()
+        observer.join()
 
-    observer.join()
+        if STOP_FILE.exists():
+            STOP_FILE.unlink()
 
+        remove_pid()
+        logging.info("Monitor stopped cleanly")
 
+        
 # ============================================================
 # Entry Point
 # ============================================================
