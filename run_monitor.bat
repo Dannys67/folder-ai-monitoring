@@ -8,7 +8,7 @@ REM === Активация venv ===
 call venv\Scripts\activate.bat
 
 REM === Запуск monitor.py ===
-echo [RUN] Starting Folder AI Monitor...
+echo [RUN] Starting Folder AI Monitor....
 python monitor.py
 
 pause
